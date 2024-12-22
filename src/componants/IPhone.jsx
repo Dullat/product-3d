@@ -5,21 +5,86 @@ import { useFrame, useThree } from "@react-three/fiber"
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
-const Model = (props) => {
+const Model = (props, { timeLine }) => {
     const { nodes, materials } = useGLTF("/models/scene.glb")
 
     const texture = useTexture("/assets/yellow.jpg")
     const ref = useRef()
-    console.log(props.w * .001)
 
-    useFrame((state, delta) => {
-        ref.current.rotation.y -= delta * 0.1
-    })
+    // useFrame((state, delta) => {
+    //     ref.current.rotation.y -= delta * 0.1
+    // })
+
+    useEffect(() => {
+        props.timeLine.fromTo(
+            ref.current.rotation,
+            {
+                y: 0
+            },
+            {
+                y: Math.PI * 1.25,
+                x: Math.PI * .2,
+                z: Math.PI * -.1
+            }
+            , "<"
+        )
+            .fromTo(
+                ref.current.position,
+                {
+                    y: 0
+                },
+                {
+                    y: -.01
+                }
+                , "<"
+            )
+
+        // second
+
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.fromTo(
+            ref.current.rotation,
+            {
+            },
+            {
+                y: 0,
+                x: 0,
+                z: 0,
+                scrollTrigger: {
+                    trigger: props.tef.current,
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: true,
+                    pin: true,
+                    markers: true,
+                },
+            }
+        )
+
+        gsap.fromTo(
+            ref.current.rotation,
+            {
+            },
+            {
+                y: 0,
+                x: 0,
+                z: 0,
+                scrollTrigger: {
+                    trigger: props.tef.current,
+                    start: "bottom bottom",
+                    end: "top top",
+                    scrub: true,
+                    pin: true,
+                    markers: true,
+                },
+            }
+        )
+
+    }, [])
 
 
     useEffect(() => {
         Object.entries(materials).map((material) => {
-            // these are the material names that can't be changed color
             if (
                 material[0] !== "zFdeDaGNRwzccye" &&
                 material[0] !== "ujsvqBWRMnqdwPx" &&
